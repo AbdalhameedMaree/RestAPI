@@ -35,23 +35,22 @@ def main():
 
     print("Number of Releases:")
     releases = get_data(Releases_API)
-    print(len(releases))
+    print_data(releases)
 
     print("\nNumber of Collaborators:")
     collaborators = get_data(Collaborators_API)
-    print(len(collaborators))
-
+    print_data(collaborators)
     print("\nNumber of Branches:")
     branches = get_data(Branches_API)
-    print(len(branches))
+    print_data(branches)
 
     print("\nNumber of Commits:")
     commits = get_data(Commits_API)
-    print(len(commits))
+    print_data(commits)
 
     print("\nNumber of Pull Requests:")
     pull_requests = get_data(Pull_Requests_API)
-    print(len(pull_requests))
+    print_data(pull_requests)
 
 
 
