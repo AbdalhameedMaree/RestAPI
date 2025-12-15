@@ -53,6 +53,7 @@ def main():
         "commits": f'{base_url}/{owner}/{repo}/commits',
         "pulls": f'{base_url}/{owner}/{repo}/pulls'
     }
+    
     get_requests(end_points, 'releases', owner, pat)
     get_requests(end_points, 'collaborators', owner, pat)
     get_requests(end_points, 'branches', owner, pat)
