@@ -1,58 +1,56 @@
-
 import requests
 from dotenv import dotenv_values
-secrets = dotenv_values('.env')
 
-BaseURL = secrets['BaseURL']
-Repo = secrets['Repo']
-Owner = secrets['Owner']
-PAT = secrets['PAT']
-API_Schema = f'{BaseURL}/{Owner}/{Repo}'
-
-
-def get_data(API_url):
-    response = requests.get(API_url, auth=(Owner, PAT))
-    if response.status_code == 200:
-        return response.json()
-    else:
-        return None
-
-
-def print_data(data):
-    if data is not None:
-        for item in data:
-            print(len(item))
-    else:
-        print("No data found or error in API request.")
+def get_requests(endpoints, base_url, owner, repo, pat):
+    for end_point in endpoints:
+        full_endpoint = f'{base_url}/{owner}/{repo}/{end_point}'
+        response = requests.get(full_endpoint, auth=(owner, pat))
+        response.raise_for_status()
+        data = response.json()
+        
+        print(f"\n--- {end_point.capitalize()} ---")
+        
+        if end_point == "releases":
+            for i, item in enumerate(data, 1):
+                print(f"{i}. Name: {item.get('name')}")
+        
+        elif end_point == "collaborators":
+            for i, item in enumerate(data, 1):
+                perms = item.get('permissions', {})
+                print(f"{i}. User: {item.get('login')}, Permissions: {perms}")
+        
+        elif end_point == "branches":
+            for i, item in enumerate(data, 1):
+                print(f"{i}. Branch: {item.get('name')}")
+        
+        elif end_point == "commits":
+            for i, item in enumerate(data[:5], 1):
+                commit = item.get('commit', {})
+                author = commit.get('author', {}).get('name')
+                msg = commit.get('message')
+                date = commit.get('author', {}).get('date')
+                print(f"{i}. Author: {author}, Date: {date}, Message: {msg}")
+        
+        elif end_point == "pulls":
+            for i, item in enumerate(data, 1):
+                user = item.get('user', {}).get('login')
+                print(f"{i}. Title: {item.get('title')}, User: {user}")
+        
+        else:
+            print(f"Count: {len(data)}")
 
 
 def main():
-    Releases_API = f'{API_Schema}/releases'
-    Collaborators_API = f'{API_Schema}/collaborators'
-    Branches_API = f'{API_Schema}/branches'
-    Commits_API = f'{API_Schema}/commits'
-    Pull_Requests_API = f'{API_Schema}/pulls'
-
-    print("Number of Releases:")
-    releases = get_data(Releases_API)
-    print_data(releases)
-
-    print("\nNumber of Collaborators:")
-    collaborators = get_data(Collaborators_API)
-    print_data(collaborators)
-    print("\nNumber of Branches:")
-    branches = get_data(Branches_API)
-    print_data(branches)
-
-    print("\nNumber of Commits:")
-    commits = get_data(Commits_API)
-    print_data(commits)
-
-    print("\nNumber of Pull Requests:")
-    pull_requests = get_data(Pull_Requests_API)
-    print_data(pull_requests)
+    secrets = dotenv_values('.env')
+    base_url = 'https://api.github.com/repos'
+    owner = 'AbdalhameedMaree'
+    repo = 'Optimization-Strategies-for-Local-Package-Delivery-Operations'
+    pat = secrets.get('PAT')
 
 
+
+    end_points = ["releases", "collaborators", "branches", "commits", "pulls"]
+    get_requests(end_points, base_url, owner, repo, pat)
 
 if __name__ == "__main__":
     main()
